@@ -1,113 +1,339 @@
-import Image from 'next/image'
+/* eslint-disable react/no-unescaped-entities */
+"use client";
 
-export default function Home() {
+import React, { useReducer, useState } from 'react';
+import {
+  useReactTable,
+  getCoreRowModel,
+  ColumnDef,
+  flexRender,
+} from '@tanstack/react-table';
+import './globals.css';
+import VisibilityCompo from './compo/Vsibility';
+import DATA from "./data.json";
+
+type Person = {
+  firstName: string
+  lastName: string
+  age: number
+  visits: number
+  status: string
+  progress: number
+}
+
+const COLUMS: any = [
+  {
+    "accessorKey": "firstName",
+    "header": "First Name",
+  },
+  {
+    "accessorKey": "lastName",
+    "header": "Last Name"
+  },
+  {
+    "accessorKey": "visits",
+    "header": "Visits"
+  },
+  {
+    "accessorKey": "status",
+    "header": "Status"
+  },
+  {
+    "accessorKey": "progress",
+    "header": "Profile Progress"
+  }
+]
+
+const defaultData: Person[] = [...DATA];
+
+//* If header is not their then accessorKey will be header
+const defaultColumns: ColumnDef<Person>[] = [...COLUMS]
+
+export default function App() {
+  const rerender = useReducer(() => ({}), {})[1]
+  const [columnVisibility, setColumnVisibility] = useState({});
+
+  const table = useReactTable({
+    data: defaultData,
+    columns: defaultColumns,
+    columnResizeMode: "onChange",
+    getCoreRowModel: getCoreRowModel(),
+    state: {
+      columnVisibility,
+    },
+    onColumnVisibilityChange: setColumnVisibility,
+  });
+
+
+  // return (
+  //   <div className="p-2">
+  //       <table
+  //         style={{
+  //           width: "90vw",
+  //         }}
+  //       >
+  //         <thead>
+  //           {table2.getHeaderGroups().map(headerGroup => {
+  //             console.log(headerGroup);
+  //             return (
+  //               <tr key={headerGroup.id}>
+  //                 {headerGroup.headers.map(header => (
+  //                   <th
+  //                     key={header.id}
+  //                     style={{ width: header.getSize() }}
+  //                     colSpan={header.colSpan}
+  //                   >
+  //                     {header.isPlaceholder
+  //                       ? null
+  //                       : flexRender(
+  //                         header.column.columnDef.header,
+  //                         header.getContext()
+  //                       )}
+  //                     <div
+  //                       className={`resizer ${header.column.getIsResizing() ? 'isResizing' : null
+  //                         }`}
+  //                       onMouseDown={header.getResizeHandler()}                        
+  //                       onTouchStart={header.getResizeHandler()}
+  //                     />
+  //                   </th>
+  //                 ))}
+  //               </tr>
+  //             )
+  //           })}
+  //         </thead>
+
+  //         <tbody>
+  //           {table2.getRowModel().rows.map(row => (
+  //             <tr key={row.id}>
+  //               {row.getVisibleCells().map(cell => (
+  //                 <td
+  //                   key={cell.id}
+  //                   style={{ width: cell.column.getSize(), whiteSpace: "nowrap" }}
+  //                 >
+  //                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
+  //                 </td>
+  //               ))}
+  //             </tr>
+  //           ))}
+  //         </tbody>
+  //       </table>
+
+  //     <div className="h-4" />
+  //     <button onClick={() => rerender()} className="border p-2">
+  //       Rerender
+  //     </button>
+  //     <pre>
+  //       {JSON.stringify(
+  //         {
+  //           columnSizing: table2.getState().columnSizing,
+  //           columnSizingInfo: table2.getState().columnSizingInfo,
+  //         },
+  //         null,
+  //         2
+  //       )}
+  //     </pre>
+  //   </div>
+  // )
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="p-2">
+      {/* <div className="overflow-x-auto">
+        <table
+          {...{
+            style: {
+              width: table.getCenterTotalSize(),
+            },
+          }}
+        >
+          <thead>
+            {table.getHeaderGroups().map(headerGroup => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <th
+                    key={header.id}
+                    {...{
+                      // key: header.id,
+                      colSpan: header.colSpan,
+                      style: {
+                        width: header.getSize(),
+                      },
+                    }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    <div
+                      {...{
+                        onMouseDown: header.getResizeHandler(),
+                        onTouchStart: header.getResizeHandler(),
+                        className: `resizer ${header.column.getIsResizing() ? 'isResizing' : ''
+                          }`,
+                        style: {
+                          transform:
+                              header.column.getIsResizing()
+                              ? `translateX(${table.getState().columnSizingInfo.deltaOffset
+                              }px)`
+                              : '',
+                        },
+                      }}
+                    />
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map(row => (
+              <tr key={row.id}>
+                {row.getVisibleCells().map(cell => (
+                  <td
+                  key={cell.id}
+                    {...{
+                      // key: cell.id,
+                      style: {
+                        width: cell.column.getSize(),
+                      },
+                    }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="h-4" /> */}
+      <VisibilityCompo table={table} />
+      <div className="text-xl">{'<div/> (relative)'}</div>
+      <div className="overflow-x-auto h-72">
+        <div
+          {...{
+            className: 'divTable',
+            style: {
+              // width: table.getTotalSize(),
+              width: "90vw",
+              overflow: "scroll"
+            },
+          }}
+        >
+          <div>
+            {table.getHeaderGroups().map(headerGroup => (
+              <div key={headerGroup.id} className='tr'>
+                {headerGroup.headers.map(header => (
+                  <div
+                    key={header.id}
+                    className='th'
+                    {...{
+                      // key: header.id,
+                      colSpan: header.colSpan,
+                      style: {
+                        width: header.getSize(),
+                      },
+                    }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    <div
+                      {...{
+                        onMouseDown: header.getResizeHandler(),
+                        onTouchStart: header.getResizeHandler(),
+                        className: `resizer ${header.column.getIsResizing() ? 'isResizing' : ''}`,
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div
+            {...{
+              className: 'tbody',
+            }}
           >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            {table.getRowModel().rows.map(row => (
+              <div
+                key={row.id}
+                {...{
+                  className: 'tr',
+                }}
+              >
+                {row.getVisibleCells().map(cell => (
+                  <div
+                    key={cell.id}
+                    {...{
+                      // key: cell.id,
+                      className: 'td',
+                      style: {
+                        width: cell.column.getSize(),
+                      },
+                    }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className="h-4" />
+      <div className="text-xl">{'<div/> (absolute positioning)'}</div>
+      <div>
+        <label className='w-screen block text-black bg-white'>Emergency</label>
+        <div className="overflow-x-auto">
+          <div
+            {...{
+              className: 'divTable',
+              style: {
+                width: table.getTotalSize(),
+              },
+            }}
+          >
+            <div
+              {...{
+                className: 'tbody',
+              }}
+            >
+              {table.getRowModel().rows.map(row => (
+                <div
+                  key={row.id}
+                  {...{
+                    // key: row.id,
+                    className: 'tr',
+                    style: {
+                      position: 'relative',
+                    },
+                  }}
+                >
+                  {row.getVisibleCells().map(cell => (
+                    <div
+                      key={cell.id}
+                      {...{
+                        // key: cell.id,
+                        className: 'td',
+                        style: {
+                          position: 'absolute',
+                          left: cell.column.getStart(),
+                          width: cell.column.getSize(),
+                        },
+                      }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   )
 }
