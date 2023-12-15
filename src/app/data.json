@@ -13,7 +13,17 @@
         "age": 24,
         "visits": 100,
         "status": "In Relationship with code",
-        "progress": 50
+        "progress": 50,
+        "subRows": [
+          {
+            "firstName": "Rahul2",
+            "lastName": "Ghosh2",
+            "age": 24,
+            "visits": 100,
+            "status": "In Relationship with code2",
+            "progress": 50
+          }
+        ]
       },
       {
         "firstName": "Devanshu",
